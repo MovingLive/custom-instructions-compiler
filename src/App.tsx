@@ -167,8 +167,8 @@ function App() {
           </div>
 
         {/* Process Steps */}
-        <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">How It Works</h2>
+        <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-lg p-6 mb-6`}>
+          <h2 className={`text-xl font-semibold ${darkMode ? 'text-white' : 'text-gray-800'} mb-4`}>How It Works</h2>
           <div className="grid grid-cols-1 md:grid-cols-7 gap-4">
             <div className="flex flex-col items-center text-center">
               <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-2">
@@ -204,16 +204,16 @@ function App() {
               <p className="text-sm font-medium">4. Activate in Settings</p>
             </div>
           </div>
-          <div className="mt-4 bg-gray-50 rounded-lg p-4">
-            <p className="text-sm text-gray-600 font-mono">To activate Custom Instructions in VS Code:</p>
-            <code className="block mt-2 text-xs bg-gray-100 p-2 rounded">
+          <div className={`mt-4 ${darkMode ? 'bg-gray-700' : 'bg-gray-50'} rounded-lg p-4`}>
+            <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'} font-mono`}>To activate Custom Instructions in VS Code:</p>
+            <code className={`block mt-2 text-xs ${darkMode ? 'bg-gray-600' : 'bg-gray-100'} p-2 rounded`}>
               "github.copilot.chat.codeGeneration.useInstructionFiles": true
             </code>
           </div>
         </div>
 
         {/* Main Content */}
-        <div className="bg-white rounded-lg shadow-lg p-6">
+        <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-lg p-6`}>
 
           <div className="mb-6">
             <div className="flex gap-3">
@@ -222,7 +222,7 @@ function App() {
                 value={repoUrl}
                 onChange={(e) => setRepoUrl(e.target.value)}
                 placeholder="Enter GitHub repository URL"
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                className={`flex-1 px-4 py-2 border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none`}
               />
               <button
                 onClick={fetchRepo}
@@ -243,7 +243,7 @@ function App() {
 
           {treeData.length > 0 && (
             <>
-              <div className="border rounded-lg p-4 mb-6 max-h-[60vh] overflow-y-auto">
+              <div className={`border ${darkMode ? 'border-gray-700' : ''} rounded-lg p-4 mb-6 max-h-[60vh] overflow-y-auto`}>
                 <FileTree
                   data={treeData}
                   selectedFiles={selectedFiles}
