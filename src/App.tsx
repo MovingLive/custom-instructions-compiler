@@ -15,6 +15,7 @@ function App() {
   const [selectedFiles, setSelectedFiles] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [darkMode, setDarkMode] = useState(false);
 
   const octokit = new Octokit();
 
@@ -149,14 +150,20 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className={`min-h-screen ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-50 text-black'}`}>
       <div className="max-w-4xl mx-auto p-6">
-        <div className="bg-white rounded-lg shadow-lg p-6">
+        <div className={`bg-white ${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-lg p-6`}>
           <div className="flex items-center mb-8">
             <Github className="w-8 h-8 text-gray-700 mr-3" />
-            <h1 className="text-2xl font-bold text-gray-800">
+            <h1 className="text-2xl font-bold">
               Custom Instructions Compiler
             </h1>
+            <button
+              onClick={() => setDarkMode(!darkMode)}
+              className="ml-auto px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+            >
+              {darkMode ? 'Light Mode' : 'Dark Mode'}
+            </button>
           </div>
 
           <div className="mb-6">
