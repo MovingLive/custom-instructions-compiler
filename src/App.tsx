@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import { ArrowRight, Cog, Download, FileCheck, Github, Link, Loader2 } from 'lucide-react';
 import { Octokit } from 'octokit';
-import { Download, Github, Loader2 } from 'lucide-react';
+import { useState } from 'react';
 import FileTree from './components/FileTree';
 
 interface TreeNode {
@@ -77,9 +77,9 @@ function App() {
     try {
       setLoading(true);
       setError('');
-      const { owner, repo } = parseGithubUrl(repoUrl);
+      const { owner, repo } = parseGitHubUrl(repoUrl);
 
-      const { data: { tree } } = await octokit.rest.git.getTree({
+      const { data: { tree } } = await octokit.request('GET /repos/{owner}/{repo}/git/trees/{tree_sha}', {
         owner,
         repo,
         tree_sha: 'main',
@@ -104,9 +104,9 @@ function App() {
       const next = new Set(prev);
       if (next.has(path)) {
         next.delete(path);
-      } else {
+    } else {
         next.add(path);
-      }
+    }
       return next;
     });
   };
@@ -152,7 +152,7 @@ function App() {
   return (
     <div className={`min-h-screen ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-50 text-black'}`}>
       <div className="max-w-4xl mx-auto p-6">
-        <div className={`bg-white ${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-lg p-6`}>
+      <div className={`bg-white ${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-lg p-6`}>
           <div className="flex items-center mb-8">
             <Github className="w-8 h-8 text-gray-700 mr-3" />
             <h1 className="text-2xl font-bold">
@@ -165,6 +165,55 @@ function App() {
               {darkMode ? 'Light Mode' : 'Dark Mode'}
             </button>
           </div>
+
+        {/* Process Steps */}
+        <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">How It Works</h2>
+          <div className="grid grid-cols-1 md:grid-cols-7 gap-4">
+            <div className="flex flex-col items-center text-center">
+              <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-2">
+                <Link className="w-6 h-6 text-blue-600" />
+              </div>
+              <p className="text-sm font-medium">1. Enter Repository URL</p>
+            </div>
+            <div className="hidden md:flex items-center justify-center">
+              <ArrowRight className="w-5 h-5 text-gray-400" />
+            </div>
+            <div className="flex flex-col items-center text-center">
+              <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-2">
+                <FileCheck className="w-6 h-6 text-green-600" />
+              </div>
+              <p className="text-sm font-medium">2. Select MD Files</p>
+            </div>
+            <div className="hidden md:flex items-center justify-center">
+              <ArrowRight className="w-5 h-5 text-gray-400" />
+            </div>
+            <div className="flex flex-col items-center text-center">
+              <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center mb-2">
+                <Download className="w-6 h-6 text-yellow-600" />
+              </div>
+              <p className="text-sm font-medium">3. Download Instructions</p>
+            </div>
+            <div className="hidden md:flex items-center justify-center">
+              <ArrowRight className="w-5 h-5 text-gray-400" />
+            </div>
+            <div className="flex flex-col items-center text-center">
+              <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mb-2">
+                <Cog className="w-6 h-6 text-purple-600" />
+              </div>
+              <p className="text-sm font-medium">4. Activate in Settings</p>
+            </div>
+          </div>
+          <div className="mt-4 bg-gray-50 rounded-lg p-4">
+            <p className="text-sm text-gray-600 font-mono">To activate Custom Instructions in VS Code:</p>
+            <code className="block mt-2 text-xs bg-gray-100 p-2 rounded">
+              "github.copilot.chat.codeGeneration.useInstructionFiles": true
+            </code>
+          </div>
+        </div>
+
+        {/* Main Content */}
+        <div className="bg-white rounded-lg shadow-lg p-6">
 
           <div className="mb-6">
             <div className="flex gap-3">
@@ -216,6 +265,7 @@ function App() {
           )}
         </div>
       </div>
+    </div>
     </div>
   );
 }
