@@ -31,11 +31,11 @@ function App() {
 
   const buildTree = (items: any[]): TreeNode[] => {
     const root: { [key: string]: TreeNode } = {};
-    
+
     items.forEach(item => {
       const parts = item.path.split('/');
       let current = root;
-      
+
       parts.forEach((part: string, index: number) => {
         const path = parts.slice(0, index + 1).join('/');
         if (!current[path]) {
@@ -77,7 +77,7 @@ function App() {
       setLoading(true);
       setError('');
       const { owner, repo } = parseGithubUrl(repoUrl);
-      
+
       const { data: { tree } } = await octokit.rest.git.getTree({
         owner,
         repo,
@@ -85,8 +85,8 @@ function App() {
         recursive: '1'
       });
 
-      const markdownFiles = tree.filter(item => 
-        item.type === 'blob' && 
+      const markdownFiles = tree.filter(item =>
+        item.type === 'blob' &&
         item.path.endsWith('.md')
       );
 
@@ -114,7 +114,7 @@ function App() {
     try {
       setLoading(true);
       const { owner, repo } = parseGithubUrl(repoUrl);
-      
+
       const fileContents = await Promise.all(
         Array.from(selectedFiles).map(async path => {
           const { data } = await octokit.rest.repos.getContent({
@@ -122,9 +122,9 @@ function App() {
             repo,
             path
           });
-          
+
           if ('content' in data) {
-            const content = atob(data.content);
+            const content = decodeURIComponent(escape(atob(data.content)));
             return `# From ${path}\n\n${content}\n\n`;
           }
           return '';
