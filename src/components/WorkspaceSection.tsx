@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Download, Loader2 } from 'lucide-react';
 import FileTree from './FileTree';
+import { Octokit } from 'octokit';
 
 interface TreeNode {
   path: string;
@@ -15,7 +16,7 @@ export default function WorkspaceSection() {
   const [error, setError] = useState('');
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const [filename, setFilename] = useState('copilot-instructions.md');
-  
+
   const getAllFolderPaths = (nodes: TreeNode[]): string[] => {
     const paths: string[] = [];
     nodes.forEach(node => {
@@ -46,7 +47,11 @@ export default function WorkspaceSection() {
             children: filteredChildren,
           };
         }
-        return node;
+        // Convert 'blob' type to 'file' type
+        return {
+          ...node,
+          type: 'file'
+        };
       })
       .filter(node => {
         if (node.type === 'file') {
@@ -71,46 +76,85 @@ export default function WorkspaceSection() {
     loadWorkspaceFiles();
   }, []);
 
+  const octokit = new Octokit();
+
   const loadWorkspaceFiles = async () => {
     try {
       setLoading(true);
       setError('');
 
-      // Simulate workspace file structure for lib directory
-      const workspaceTree: TreeNode[] = [{
-        path: 'lib',
-        type: 'tree',
-        children: [
-          {
-            path: 'lib/react.md',
-            type: 'file'
-          },
-          {
-            path: 'lib/typescript.md',
-            type: 'file'
-          },
-          {
-            path: 'lib/basic-setup.md',
-            type: 'file'
-          },
-          {
-            path: 'lib/best-practices',
-            type: 'tree',
-            children: [
-              {
-                path: 'lib/best-practices/coding-standards.md',
-                type: 'file'
-              },
-              {
-                path: 'lib/best-practices/basic-guidelines.md',
-                type: 'file'
-              }
-            ]
-          }
-        ]
-      }];
+      const owner = 'MovingLive';
+      const repo = 'custom-instructions-compiler';
 
-      const filteredTree = filterEmptyFolders(workspaceTree);
+      // Fetch repo default branch
+      const { data: repoData } = await octokit.request('GET /repos/{owner}/{repo}', {
+        owner,
+        repo,
+      });
+
+      const defaultBranch = repoData.default_branch;
+
+      // Get tree data
+      const { data: { tree } } = await octokit.request('GET /repos/{owner}/{repo}/git/trees/{tree_sha}', {
+        owner,
+        repo,
+        tree_sha: defaultBranch,
+        recursive: '1',
+      });
+
+      if (!tree || tree.length === 0) {
+        throw new Error('No files found in repository');
+      }
+
+      const processTree = (items: any[]): TreeNode[] => {
+        const nodes: { [key: string]: TreeNode } = {};
+        const result: TreeNode[] = [];
+
+        items.forEach(item => {
+          if (!item.path.endsWith('.md') && item.type !== 'tree') return;
+
+          const parts = item.path.split('/');
+          let currentPath = '';
+
+          parts.forEach((part: string, index: number) => {
+            const parentPath = currentPath;
+            currentPath = currentPath ? `${currentPath}/${part}` : part;
+
+            if (!nodes[currentPath]) {
+              const node: TreeNode = {
+                path: currentPath,
+                type: index === parts.length - 1 ? item.type : 'tree',
+                children: []
+              };
+              nodes[currentPath] = node;
+
+              if (parentPath) {
+                nodes[parentPath].children?.push(node);
+              } else {
+                result.push(node);
+              }
+            }
+          });
+        });
+
+        return result;
+      };
+
+      /* positionner le tree dans le dossier custom-instruction qui est à la racine du projet */
+      const customInstructionsTree = tree.filter((item: any) => {
+        // Garde uniquement les éléments qui sont soit le dossier custom-instructions
+        // soit des fichiers/dossiers à l'intérieur
+        return item.path === 'custom-instructions' ||
+                item.path.startsWith('custom-instructions/');
+      });
+
+      const processedTree = processTree(customInstructionsTree);
+      const filteredTree = filterEmptyFolders(processedTree);
+
+      if (filteredTree.length === 0) {
+        throw new Error('No markdown files found in repository');
+      }
+
       const newSelected = new Set<string>();
       autoSelectBasicFiles(filteredTree, newSelected);
 
@@ -121,7 +165,9 @@ export default function WorkspaceSection() {
       setTreeData(filteredTree);
       setSelectedFiles(newSelected);
     } catch (err: any) {
-      setError(err.message);
+      setError(err.message || 'Failed to load repository');
+      setTreeData([]);
+      setSelectedFiles(new Set());
     } finally {
       setLoading(false);
     }
