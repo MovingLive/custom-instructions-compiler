@@ -7,7 +7,8 @@ import {
   filterEmptyFolders,
   autoSelectBasicFiles,
   TreeNode,
-  processTree
+  processTree,
+  getBasePath
 } from './utils';
 
 export default function WorkspaceSection() {
@@ -27,7 +28,8 @@ export default function WorkspaceSection() {
       setLoading(true);
       setError('');
 
-      const response = await fetch('/custom-instructions/file-list.json');
+      const basePath = getBasePath();
+      const response = await fetch(`${basePath}/file-list.json`);
       const items = await response.json();
 
       const processedTree = processTree(items);
@@ -70,9 +72,10 @@ export default function WorkspaceSection() {
       setLoading(true);
       setError('');
 
+      const basePath = getBasePath();
       const fileContents = await Promise.all(
         Array.from(selectedFiles).map(async path => {
-          const response = await fetch(`/custom-instructions/${path}`);
+          const response = await fetch(`${basePath}/${path}`);
           const content = await response.text();
           return `# Fichier: ${path}\n\n${content}`;
         })

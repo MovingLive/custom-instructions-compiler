@@ -91,3 +91,11 @@ export const processTree = (items: any[]): TreeNode[] => {
 
   return result;
 };
+
+export const getBasePath = () => {
+  if (process.env.NODE_ENV === 'development') {
+    return '/custom-instructions';
+  }
+  const repoName = 'custom-instructions-compiler'; // Remplacez par votre nom de repo
+  return `/${repoName}/custom-instructions`;
+};
