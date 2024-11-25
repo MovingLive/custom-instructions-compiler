@@ -217,7 +217,7 @@ export default function WorkspaceSection() {
   return (
     <div>
       <p className="text-gray-600 dark:text-gray-300 mb-6">
-        Select and compile custom instructions from your workspace's 'lib' directory.
+        Select and compile custom instructions from this Repo.
       </p>
 
       {error && (
