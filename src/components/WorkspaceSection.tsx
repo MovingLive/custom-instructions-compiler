@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Download, Loader2 } from 'lucide-react';
 import FileTree from './FileTree';
-import { Octokit } from 'octokit';
 import {
   getAllFolderPaths,
   hasMarkdownFiles,
@@ -20,65 +19,35 @@ export default function WorkspaceSection() {
   const [filename, setFilename] = useState('copilot-instructions.md');
 
   useEffect(() => {
-    loadWorkspaceFiles();
+    loadLocalFiles();
   }, []);
 
-  const octokit = new Octokit();
-
-  const loadWorkspaceFiles = async () => {
+  const loadLocalFiles = async () => {
     try {
       setLoading(true);
       setError('');
 
-      const owner = 'MovingLive';
-      const repo = 'custom-instructions-compiler';
+      const response = await fetch('/custom-instructions/file-list.json');
+      const items = await response.json();
 
-      // Fetch repo default branch
-      const { data: repoData } = await octokit.request('GET /repos/{owner}/{repo}', {
-        owner,
-        repo,
-      });
-
-      const defaultBranch = repoData.default_branch;
-
-      // Get tree data
-      const { data: { tree } } = await octokit.request('GET /repos/{owner}/{repo}/git/trees/{tree_sha}', {
-        owner,
-        repo,
-        tree_sha: defaultBranch,
-        recursive: '1',
-      });
-
-      if (!tree || tree.length === 0) {
-        throw new Error('No files found in repository');
-      }
-
-      /* positionner le tree dans le dossier custom-instruction qui est à la racine du projet */
-      const customInstructionsTree = tree.filter((item: any) => {
-        // Garde uniquement les éléments qui sont soit le dossier custom-instructions
-        // soit des fichiers/dossiers à l'intérieur
-        return item.path === 'custom-instructions' ||
-                item.path.startsWith('custom-instructions/');
-      });
-
-      const processedTree = processTree(customInstructionsTree);
+      const processedTree = processTree(items);
       const filteredTree = filterEmptyFolders(processedTree);
 
       if (filteredTree.length === 0) {
-        throw new Error('No markdown files found in repository');
+        throw new Error('Aucun fichier markdown trouvé');
       }
 
       const newSelected = new Set<string>();
       autoSelectBasicFiles(filteredTree, newSelected);
 
-      // Expand all folders
+      // Étendre tous les dossiers
       const allFolderPaths = getAllFolderPaths(filteredTree);
       setExpanded(new Set(allFolderPaths));
 
       setTreeData(filteredTree);
       setSelectedFiles(newSelected);
     } catch (err: any) {
-      setError(err.message || 'Failed to load repository');
+      setError(err.message || 'Échec du chargement des fichiers locaux');
       setTreeData([]);
       setSelectedFiles(new Set());
     } finally {
@@ -101,11 +70,13 @@ export default function WorkspaceSection() {
       setLoading(true);
       setError('');
 
-      // Simulate reading workspace files
-      const fileContents = Array.from(selectedFiles).map(path => {
-        // This is a placeholder. In a real implementation, you would read the actual file contents
-        return `# File: ${path}\n\nThis is the content of ${path}`;
-      });
+      const fileContents = await Promise.all(
+        Array.from(selectedFiles).map(async path => {
+          const response = await fetch(`/custom-instructions/${path}`);
+          const content = await response.text();
+          return `# Fichier: ${path}\n\n${content}`;
+        })
+      );
 
       const combinedContent = fileContents.join('\n\n---\n\n');
       const blob = new Blob([new TextEncoder().encode(combinedContent)], {
