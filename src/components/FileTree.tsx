@@ -11,11 +11,17 @@ interface FileTreeProps {
   data: TreeNode[];
   selectedFiles: Set<string>;
   onFileSelect: (path: string) => void;
+  expanded: Set<string>;
+  setExpanded: React.Dispatch<React.SetStateAction<Set<string>>>;
 }
 
-const FileTree: React.FC<FileTreeProps> = ({ data, selectedFiles, onFileSelect }) => {
-  const [expanded, setExpanded] = React.useState<Set<string>>(new Set());
-
+const FileTree: React.FC<FileTreeProps> = ({ 
+  data, 
+  selectedFiles, 
+  onFileSelect,
+  expanded,
+  setExpanded 
+}) => {
   const toggleFolder = (path: string) => {
     const newExpanded = new Set(expanded);
     if (expanded.has(path)) {
@@ -34,8 +40,8 @@ const FileTree: React.FC<FileTreeProps> = ({ data, selectedFiles, onFileSelect }
     return (
       <div key={node.path} className="select-none">
         <div
-          className={`flex items-center py-1 px-2 hover:bg-gray-100 rounded cursor-pointer ${
-            isSelected && !isFolder ? 'bg-blue-50' : ''
+          className={`flex items-center py-1 px-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded cursor-pointer transition-colors ${
+            isSelected && !isFolder ? 'bg-blue-50 dark:bg-blue-900' : ''
           }`}
           style={{ paddingLeft: `${level * 1.5}rem` }}
           onClick={() => isFolder ? toggleFolder(node.path) : onFileSelect(node.path)}
@@ -45,19 +51,19 @@ const FileTree: React.FC<FileTreeProps> = ({ data, selectedFiles, onFileSelect }
               <span className="mr-1">
                 {isExpanded ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
               </span>
-              <Folder size={18} className="mr-2 text-yellow-500" />
+              <Folder size={18} className="mr-2 text-yellow-500 dark:text-yellow-400" />
             </>
           ) : (
             <>
               <span className="w-[18px] mr-1" />
-              <File size={18} className="mr-2 text-gray-500" />
+              <File size={18} className="mr-2 text-gray-500 dark:text-gray-400" />
             </>
           )}
-          <span className="text-sm">{node.path.split('/').pop()}</span>
+          <span className="text-sm dark:text-gray-200">{node.path.split('/').pop()}</span>
           {!isFolder && (
             <input
               type="checkbox"
-              className="ml-auto"
+              className="ml-auto accent-blue-600"
               checked={isSelected}
               onChange={() => onFileSelect(node.path)}
               onClick={(e) => e.stopPropagation()}
@@ -74,6 +80,6 @@ const FileTree: React.FC<FileTreeProps> = ({ data, selectedFiles, onFileSelect }
   };
 
   return <div className="w-full">{data.map((node) => renderNode(node))}</div>;
-};
+}
 
 export default FileTree;

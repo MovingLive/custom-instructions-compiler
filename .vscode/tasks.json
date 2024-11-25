@@ -1,0 +1,13 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "npm: dev - frontend",
+            "type": "npm",
+            "script": "dev",
+            "path": "/",
+            "detail": "Executes the dev script in the frontend package.json",
+            "problemMatcher": []
+        }
+    ]
+}
