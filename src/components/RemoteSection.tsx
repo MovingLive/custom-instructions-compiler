@@ -1,13 +1,14 @@
-import React, { useState } from 'react';
 import { Download, Loader2 } from 'lucide-react';
 import { Octokit } from 'octokit';
+import { useState } from 'react';
 import FileTree from './FileTree';
-
-interface TreeNode {
-  path: string;
-  type: 'file' | 'tree';
-  children?: TreeNode[];
-}
+import {
+  autoSelectBasicFiles,
+  filterEmptyFolders,
+  getAllFolderPaths,
+  processTree,
+  TreeNode
+} from './utils';
 
 export default function RemoteSection() {
   const [repoUrl, setRepoUrl] = useState('');
@@ -16,21 +17,9 @@ export default function RemoteSection() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
-
+  const [filename, setFilename] = useState('copilot-instructions.md');
+  
   const octokit = new Octokit();
-
-  const getAllFolderPaths = (nodes: TreeNode[]): string[] => {
-    const paths: string[] = [];
-    nodes.forEach(node => {
-      if (node.type === 'tree') {
-        paths.push(node.path);
-        if (node.children) {
-          paths.push(...getAllFolderPaths(node.children));
-        }
-      }
-    });
-    return paths;
-  };
 
   const parseGitHubUrl = (url: string) => {
     try {
@@ -45,51 +34,6 @@ export default function RemoteSection() {
     } catch (err) {
       throw new Error('Please enter a valid GitHub repository URL');
     }
-  };
-
-  const hasMarkdownFiles = (node: TreeNode): boolean => {
-    if (node.type === 'file' || node.type === 'blob') {  // Add 'blob' type check
-      return node.path.endsWith('.md');
-    }
-    return node.children?.some(child => hasMarkdownFiles(child)) ?? false;
-  };
-
-  const filterEmptyFolders = (nodes: TreeNode[]): TreeNode[] => {
-    return nodes
-      .map(node => {
-        if (node.type === 'tree') {
-          const filteredChildren = filterEmptyFolders(node.children || []);
-          return {
-            ...node,
-            children: filteredChildren,
-          };
-        }
-        // Convert 'blob' type to 'file' type
-        return {
-          ...node,
-          type: 'file'
-        };
-      })
-      .filter(node => {
-        if (node.type === 'file' || node.type === 'blob') {
-          return node.path.endsWith('.md');
-        }
-        if (node.type === 'tree') {
-          return node.children && node.children.length > 0;
-        }
-        return false;
-      });
-  };
-
-  const autoSelectBasicFiles = (nodes: TreeNode[], selected: Set<string>) => {
-    nodes.forEach(node => {
-      if (node.type === 'file' && node.path.toLowerCase().includes('basic') && node.path.endsWith('.md')) {
-        selected.add(node.path);
-      }
-      if (node.children) {
-        autoSelectBasicFiles(node.children, selected);
-      }
-    });
   };
 
   const fetchRepo = async () => {
@@ -123,40 +67,6 @@ export default function RemoteSection() {
       if (!tree || tree.length === 0) {
         throw new Error('No files found in repository');
       }
-
-      const processTree = (items: any[]): TreeNode[] => {
-        const nodes: { [key: string]: TreeNode } = {};
-        const result: TreeNode[] = [];
-
-        items.forEach(item => {
-          if (!item.path.endsWith('.md') && item.type !== 'tree') return;
-
-          const parts = item.path.split('/');
-          let currentPath = '';
-
-          parts.forEach((part: string, index: number) => {
-            const parentPath = currentPath;
-            currentPath = currentPath ? `${currentPath}/${part}` : part;
-
-            if (!nodes[currentPath]) {
-              const node: TreeNode = {
-                path: currentPath,
-                type: index === parts.length - 1 ? item.type : 'tree',
-                children: []
-              };
-              nodes[currentPath] = node;
-
-              if (parentPath) {
-                nodes[parentPath].children?.push(node);
-              } else {
-                result.push(node);
-              }
-            }
-          });
-        });
-
-        return result;
-      };
 
       const processedTree = processTree(tree);
       const filteredTree = filterEmptyFolders(processedTree);
@@ -224,7 +134,7 @@ export default function RemoteSection() {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'github-instruction.md';
+      a.download = filename;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -279,16 +189,23 @@ export default function RemoteSection() {
             />
           </div>
 
-          <div className="flex justify-end">
-            <button
-              onClick={downloadSelectedFiles}
-              disabled={loading || selectedFiles.size === 0}
-              className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:bg-green-400 dark:disabled:bg-green-500"
-            >
-              <Download className="w-5 h-5" />
-              Generate Instructions
-            </button>
-          </div>
+          <div className="flex justify-end items-center gap-4">
+        <input
+          type="text"
+          value={filename}
+          onChange={(e) => setFilename(e.target.value)}
+          placeholder="Filename"
+          className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
+        />
+        <button
+          onClick={downloadSelectedFiles}
+          disabled={loading || selectedFiles.size === 0}
+          className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:bg-green-400 dark:disabled:bg-green-500"
+        >
+          <Download className="w-5 h-5" />
+          Generate Custom Instructions
+        </button>
+      </div>
         </>
       )}
     </div>

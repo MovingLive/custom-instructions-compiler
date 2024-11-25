@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { Download, Loader2 } from 'lucide-react';
 import FileTree from './FileTree';
 import { Octokit } from 'octokit';
-
-interface TreeNode {
-  path: string;
-  type: 'file' | 'tree';
-  children?: TreeNode[];
-}
+import {
+  getAllFolderPaths,
+  hasMarkdownFiles,
+  filterEmptyFolders,
+  autoSelectBasicFiles,
+  TreeNode,
+  processTree
+} from './utils';
 
 export default function WorkspaceSection() {
   const [treeData, setTreeData] = useState<TreeNode[]>([]);
@@ -16,61 +18,6 @@ export default function WorkspaceSection() {
   const [error, setError] = useState('');
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const [filename, setFilename] = useState('copilot-instructions.md');
-
-  const getAllFolderPaths = (nodes: TreeNode[]): string[] => {
-    const paths: string[] = [];
-    nodes.forEach(node => {
-      if (node.type === 'tree') {
-        paths.push(node.path);
-        if (node.children) {
-          paths.push(...getAllFolderPaths(node.children));
-        }
-      }
-    });
-    return paths;
-  };
-
-  const hasMarkdownFiles = (node: TreeNode): boolean => {
-    if (node.type === 'file') {
-      return node.path.endsWith('.md');
-    }
-    return node.children?.some(child => hasMarkdownFiles(child)) ?? false;
-  };
-
-  const filterEmptyFolders = (nodes: TreeNode[]): TreeNode[] => {
-    return nodes
-      .map(node => {
-        if (node.type === 'tree') {
-          const filteredChildren = filterEmptyFolders(node.children || []);
-          return {
-            ...node,
-            children: filteredChildren,
-          };
-        }
-        // Convert 'blob' type to 'file' type
-        return {
-          ...node,
-          type: 'file'
-        };
-      })
-      .filter(node => {
-        if (node.type === 'file') {
-          return node.path.endsWith('.md');
-        }
-        return hasMarkdownFiles(node);
-      });
-  };
-
-  const autoSelectBasicFiles = (nodes: TreeNode[], selected: Set<string>) => {
-    nodes.forEach(node => {
-      if (node.type === 'file' && node.path.toLowerCase().includes('basic') && node.path.endsWith('.md')) {
-        selected.add(node.path);
-      }
-      if (node.children) {
-        autoSelectBasicFiles(node.children, selected);
-      }
-    });
-  };
 
   useEffect(() => {
     loadWorkspaceFiles();
@@ -105,40 +52,6 @@ export default function WorkspaceSection() {
       if (!tree || tree.length === 0) {
         throw new Error('No files found in repository');
       }
-
-      const processTree = (items: any[]): TreeNode[] => {
-        const nodes: { [key: string]: TreeNode } = {};
-        const result: TreeNode[] = [];
-
-        items.forEach(item => {
-          if (!item.path.endsWith('.md') && item.type !== 'tree') return;
-
-          const parts = item.path.split('/');
-          let currentPath = '';
-
-          parts.forEach((part: string, index: number) => {
-            const parentPath = currentPath;
-            currentPath = currentPath ? `${currentPath}/${part}` : part;
-
-            if (!nodes[currentPath]) {
-              const node: TreeNode = {
-                path: currentPath,
-                type: index === parts.length - 1 ? item.type : 'tree',
-                children: []
-              };
-              nodes[currentPath] = node;
-
-              if (parentPath) {
-                nodes[parentPath].children?.push(node);
-              } else {
-                result.push(node);
-              }
-            }
-          });
-        });
-
-        return result;
-      };
 
       /* positionner le tree dans le dossier custom-instruction qui est à la racine du projet */
       const customInstructionsTree = tree.filter((item: any) => {
