@@ -4,10 +4,14 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
+    "dev": "npm run generate-file-list && vite",
+    "build": "npm run generate-file-list && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "generate-file-list": "node scripts/generate-file-list.js",
+    "predev": "mkdir -p custom-instructions",
+    "prebuild": "mkdir -p custom-instructions",
+    "generate-deploy-list": "node scripts/generate-file-list.js --deploy"
   },
   "dependencies": {
     "lucide-react": "^0.344.0",
