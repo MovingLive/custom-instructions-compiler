@@ -120,5 +120,5 @@ export const processTree = (items: any[]): TreeNode[] => {
 };
 
 export const getBasePath = () => {
-  return "/custom-instructions-lib";
+  return "/custom-instructions-compiler/custom-instructions-lib";
 };
