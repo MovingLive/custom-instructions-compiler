@@ -8,7 +8,7 @@
     "type": "file"
   },
   {
-    "path": "backend/java.md",
+    "path": "backend/python-fastapi.md",
     "type": "file"
   },
   {
@@ -28,19 +28,11 @@
     "type": "file"
   },
   {
-    "path": "file-list.json",
-    "type": "file"
-  },
-  {
     "path": "frontend",
     "type": "tree"
   },
   {
     "path": "frontend/basic-frontend-guidelines.md",
-    "type": "file"
-  },
-  {
-    "path": "frontend/react.md",
     "type": "file"
   },
   {

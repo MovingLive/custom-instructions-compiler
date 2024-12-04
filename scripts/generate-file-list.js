@@ -33,8 +33,8 @@ const isDeployment = process.argv.includes('--deploy');
 // Choix du dossier selon le contexte
 const baseDir = process.cwd();
 const targetDir = isDeployment
-  ? path.join(baseDir, 'dist', 'custom-instructions')
-  : path.join(baseDir, 'custom-instructions');
+  ? path.join(baseDir, 'dist', 'custom-instructions-lib')
+  : path.join(baseDir, 'custom-instructions-lib');
 
 // Créer le dossier s'il n'existe pas (seulement en mode local)
 if (!isDeployment && !fs.existsSync(targetDir)) {
