@@ -1,40 +1,40 @@
+
 # GitHub Custom Instructions Compiler
 
-Librairie de Custom Instructions destinée aux utilisateurs de GitHub Copilot.
-
+Library of Custom Instructions for GitHub Copilot users.
 
 🔗 [https://movinglive.github.io/custom-instructions-compiler/](https://movinglive.github.io/custom-instructions-compiler/)
 
-## Technologies utilisées
+## Technologies Used
 
-- [React](https://reactjs.org/) avec TypeScript.
-- [Vite](https://vitejs.dev/) pour le bundling.
-- [Tailwind CSS](https://tailwindcss.com/) pour le stylage.
-- [Octokit](https://github.com/octokit/octokit.js) pour interagir avec l'API GitHub.
+- [React](https://reactjs.org/) with TypeScript.
+- [Vite](https://vitejs.dev/) for bundling.
+- [Tailwind CSS](https://tailwindcss.com/) for styling.
+- [Octokit](https://github.com/octokit/octokit.js) for interacting with the GitHub API.
 
 ## Installation
 
-Installez les dépendances avec npm :
+Install dependencies using npm:
 
 ```sh
 npm install
 ```
 
-## Utilisation
+## Usage
 
-Pour lancer l'application en mode développement :
+To run the application in development mode:
 
 ```sh
 npm run dev
 ```
 
-Pour construire l'application pour la production :
+To build the application for production:
 
 ```sh
 npm run build
 ```
 
-Pour prévisualiser l'application de production :
+To preview the production build:
 
 ```sh
 npm run preview
@@ -42,16 +42,16 @@ npm run preview
 
 ## Configuration
 
-- Le point d'entrée de l'application est [`index.html`](index.html), qui charge le script [`src/main.tsx`](src/main.tsx).
-- La configuration de Vite se trouve dans [`vite.config.ts`](vite.config.ts).
-- Les configurations TypeScript sont définies dans [`tsconfig.json`](tsconfig.json), [`tsconfig.app.json`](tsconfig.app.json) et [`tsconfig.node.json`](tsconfig.node.json).
-- La configuration ESLint est disponible dans [`eslint.config.js`](eslint.config.js).
-- Les styles sont gérés avec Tailwind CSS et configurés dans [`tailwind.config.js`](tailwind.config.js) et [`postcss.config.js`](postcss.config.js).
+- The application's entry point is [`index.html`](index.html), which loads the script [`src/main.tsx`](src/main.tsx).
+- Vite configuration is located in [`vite.config.ts`](vite.config.ts).
+- TypeScript configurations are defined in [`tsconfig.json`](tsconfig.json), [`tsconfig.app.json`](tsconfig.app.json), and [`tsconfig.node.json`](tsconfig.node.json).
+- ESLint configuration is available in [`eslint.config.js`](eslint.config.js).
+- Styling is managed using Tailwind CSS, configured in [`tailwind.config.js`](tailwind.config.js) and [`postcss.config.js`](postcss.config.js).
 
-## Déploiement
+## Deployment
 
-Le déploiement continu est mis en place avec GitHub Actions dans le fichier [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml). L'application est déployée sur GitHub Pages.
+Continuous deployment is set up with GitHub Actions in the file [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml). The application is deployed to GitHub Pages.
 
-## Licence
+## License
 
-Ce projet est sous licence GNU GPLv3. Voir le fichier [`LICENSE`](LICENSE) pour plus d'informations.
+This project is licensed under the GNU GPLv3 license. See the [`LICENSE`](LICENSE) file for more details.
