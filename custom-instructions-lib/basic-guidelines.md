@@ -4,4 +4,4 @@
 - **Structure**: Ensure modular and well-organized architecture.
 - **Security**: Protect against vulnerabilities such as XSS, CSRF, and others.
 - **SOLID**: Adhere to SOLID principles.
-- **Imports**: When generating code, add the import if it is missing.
+- **Imports**: When generating code, add the import if it is missing.git no
