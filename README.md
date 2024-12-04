@@ -1,13 +1,9 @@
 # GitHub Custom Instructions Compiler
 
-Ce projet est une application web qui permet de compiler des instructions personnalisées à partir d'un dépôt GitHub. Il vous permet de sélectionner des fichiers Markdown dans un dépôt et de générer un fichier compilé avec ces contenus.
+Librairie de Custom Instructions destinée aux utilisateurs de GitHub Copilot.
 
-## Fonctionnalités
 
-- Entrer l'URL d'un dépôt GitHub.
-- Charger l'arborescence des fichiers du dépôt.
-- Sélectionner les fichiers Markdown à inclure.
-- Générer un fichier `github-instruction.md` compilé.
+🔗 [https://movinglive.github.io/custom-instructions-compiler/](https://movinglive.github.io/custom-instructions-compiler/)
 
 ## Technologies utilisées
 
