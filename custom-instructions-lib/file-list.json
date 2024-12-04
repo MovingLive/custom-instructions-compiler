@@ -1,0 +1,58 @@
+[
+  {
+    "path": "backend",
+    "type": "tree"
+  },
+  {
+    "path": "backend/basic-backend-guidelines.md",
+    "type": "file"
+  },
+  {
+    "path": "backend/java.md",
+    "type": "file"
+  },
+  {
+    "path": "backend/python-pydandic.md",
+    "type": "file"
+  },
+  {
+    "path": "backend/python-sql-alchemy.md",
+    "type": "file"
+  },
+  {
+    "path": "backend/python.md",
+    "type": "file"
+  },
+  {
+    "path": "basic-guidelines.md",
+    "type": "file"
+  },
+  {
+    "path": "file-list.json",
+    "type": "file"
+  },
+  {
+    "path": "frontend",
+    "type": "tree"
+  },
+  {
+    "path": "frontend/basic-frontend-guidelines.md",
+    "type": "file"
+  },
+  {
+    "path": "frontend/react.md",
+    "type": "file"
+  },
+  {
+    "path": "frontend/typescript.md",
+    "type": "file"
+  },
+  {
+    "path": "migration",
+    "type": "tree"
+  },
+  {
+    "path": "migration/javascript-to-typescript-migration.md",
+    "type": "file"
+  }
+]
