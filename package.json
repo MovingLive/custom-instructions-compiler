@@ -9,8 +9,8 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "generate-file-list": "node scripts/generate-file-list.js",
-    "predev": "mkdir -p custom-instructions",
-    "prebuild": "mkdir -p custom-instructions",
+    "predev": "mkdir -p custom-instructions-lib",
+    "prebuild": "mkdir -p custom-instructions-lib",
     "generate-deploy-list": "node scripts/generate-file-list.js --deploy"
   },
   "dependencies": {
