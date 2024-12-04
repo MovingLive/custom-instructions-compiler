@@ -1,57 +1,78 @@
 export interface TreeNode {
   path: string;
-  type: 'file' | 'tree';
+
+  type: "file" | "tree";
+
   children?: TreeNode[];
 }
 
 export const getAllFolderPaths = (nodes: TreeNode[]): string[] => {
   const paths: string[] = [];
-  nodes.forEach(node => {
-    if (node.type === 'tree') {
+
+  nodes.forEach((node) => {
+    if (node.type === "tree") {
       paths.push(node.path);
+
       if (node.children) {
         paths.push(...getAllFolderPaths(node.children));
       }
     }
   });
+
   return paths;
 };
 
 export const hasMarkdownFiles = (node: TreeNode): boolean => {
-  if (node.type === 'file') {
-    return node.path.endsWith('.md');
+  if (node.type === "file") {
+    return node.path.endsWith(".md");
   }
-  return node.children?.some(child => hasMarkdownFiles(child)) ?? false;
+
+  return node.children?.some((child) => hasMarkdownFiles(child)) ?? false;
 };
 
 export const filterEmptyFolders = (nodes: TreeNode[]): TreeNode[] => {
   return nodes
-    .map(node => {
-      if (node.type === 'tree') {
+
+    .map((node) => {
+      if (node.type === "tree") {
         const filteredChildren = filterEmptyFolders(node.children || []);
+
         return {
           ...node,
+
           children: filteredChildren,
         };
       }
+
       return {
         ...node,
-        type: 'file'
+
+        type: "file",
       };
     })
-    .filter(node => {
-      if (node.type === 'file') {
-        return node.path.endsWith('.md');
+
+    .filter((node) => {
+      if (node.type === "file") {
+        return node.path.endsWith(".md");
       }
+
       return hasMarkdownFiles(node);
     });
 };
 
-export const autoSelectBasicFiles = (nodes: TreeNode[], selected: Set<string>) => {
-  nodes.forEach(node => {
-    if (node.type === 'file' && node.path.toLowerCase().includes('basic') && node.path.endsWith('.md')) {
+export const autoSelectBasicFiles = (
+  nodes: TreeNode[],
+  selected: Set<string>
+) => {
+  nodes.forEach((node) => {
+    if (
+      node.type === "file" &&
+      node.path.toLowerCase().includes("basic") &&
+      node.path.endsWith(".md")
+    ) {
       selected.add(node.path);
     }
+
     if (node.children) {
       autoSelectBasicFiles(node.children, selected);
     }
@@ -60,24 +81,30 @@ export const autoSelectBasicFiles = (nodes: TreeNode[], selected: Set<string>) =
 
 export const processTree = (items: any[]): TreeNode[] => {
   const nodes: { [key: string]: TreeNode } = {};
+
   const result: TreeNode[] = [];
 
-  items.forEach(item => {
-    if (!item.path.endsWith('.md') && item.type !== 'tree') return;
+  items.forEach((item) => {
+    if (!item.path.endsWith(".md") && item.type !== "tree") return;
 
-    const parts = item.path.split('/');
-    let currentPath = '';
+    const parts = item.path.split("/");
+
+    let currentPath = "";
 
     parts.forEach((part: string, index: number) => {
       const parentPath = currentPath;
+
       currentPath = currentPath ? `${currentPath}/${part}` : part;
 
       if (!nodes[currentPath]) {
         const node: TreeNode = {
           path: currentPath,
-          type: index === parts.length - 1 ? item.type : 'tree',
-          children: []
+
+          type: index === parts.length - 1 ? item.type : "tree",
+
+          children: [],
         };
+
         nodes[currentPath] = node;
 
         if (parentPath) {
@@ -93,9 +120,5 @@ export const processTree = (items: any[]): TreeNode[] => {
 };
 
 export const getBasePath = () => {
-  if (process.env.NODE_ENV === 'development') {
-    return '/custom-instructions';
-  }
-  const repoName = 'custom-instructions-compiler'; // Remplacez par votre nom de repo
-  return `/${repoName}/custom-instructions`;
+  return "/custom-instructions-lib";
 };
