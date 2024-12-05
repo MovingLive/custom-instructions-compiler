@@ -120,5 +120,8 @@ export const processTree = (items: any[]): TreeNode[] => {
 };
 
 export const getBasePath = () => {
-  return "/custom-instructions-lib";
+  const isProd = window.location.hostname === 'movinglive.github.io';
+  return isProd
+    ? "/custom-instructions-compiler/custom-instructions-lib"
+    : "/custom-instructions-lib";
 };

@@ -17,21 +17,13 @@ import {
 
 export default function WorkspaceSection() {
   const [treeData, setTreeData] = useState<TreeNode[]>([]);
-
   const [selectedFiles, setSelectedFiles] = useState<Set<string>>(new Set());
-
   const [loading, setLoading] = useState(false);
-
   const [error, setError] = useState("");
-
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
-
   const [filename, setFilename] = useState("copilot-instructions.md");
-
   const [previewContent, setPreviewContent] = useState<string | null>(null);
-
   const [previewFile, setPreviewFile] = useState<string | null>(null);
-
   const [previewCopied, setPreviewCopied] = useState(false);
 
   useEffect(() => {
@@ -45,13 +37,9 @@ export default function WorkspaceSection() {
       setError("");
 
       const basePath = getBasePath();
-
       const response = await fetch(`${basePath}/file-list.json`);
-
       const items = await response.json();
-
       const processedTree = processTree(items);
-
       const filteredTree = filterEmptyFolders(processedTree);
 
       if (filteredTree.length === 0) {
@@ -59,17 +47,12 @@ export default function WorkspaceSection() {
       }
 
       const newSelected = new Set<string>();
-
       autoSelectBasicFiles(filteredTree, newSelected);
 
       // Étendre tous les dossiers
-
       const allFolderPaths = getAllFolderPaths(filteredTree);
-
       setExpanded(new Set(allFolderPaths));
-
       setTreeData(filteredTree);
-
       setSelectedFiles(newSelected);
     } catch (err: any) {
       setError(err.message || "Échec du chargement des fichiers locaux");
@@ -97,9 +80,7 @@ export default function WorkspaceSection() {
   const handleFilePreview = async (path: string) => {
     if (previewFile === path) {
       setPreviewFile(null);
-
       setPreviewContent(null);
-
       return;
     }
 
@@ -139,17 +120,12 @@ export default function WorkspaceSection() {
   const downloadSelectedFiles = async () => {
     try {
       setLoading(true);
-
       setError("");
-
       const basePath = getBasePath();
-
       const fileContents = await Promise.all(
         Array.from(selectedFiles).map(async (path) => {
           const response = await fetch(`${basePath}/${path}`);
-
           const content = await response.text();
-
           return `${content}`;
         })
       );
@@ -161,19 +137,12 @@ export default function WorkspaceSection() {
       });
 
       const url = URL.createObjectURL(blob);
-
       const a = document.createElement("a");
-
       a.href = url;
-
       a.download = filename;
-
       document.body.appendChild(a);
-
       a.click();
-
       document.body.removeChild(a);
-
       URL.revokeObjectURL(url);
     } catch (err: any) {
       setError(err.message);
